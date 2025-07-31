@@ -1,0 +1,37 @@
+@import '../../../variables'; // Import your SCSS variables if you have any
+
+@mixin button-styles($color, $text-color: #fff, $bg-opacity: 0.2, $bg-opacity-hover: 0.4) {
+  background-color: rgba($color, $bg-opacity);
+  color: $color; // Tailwind's text-white
+  font-weight: bold; // Tailwind's font-bold
+  padding: 0.5rem 1rem; // Tailwind's py-2 px-4 (roughly) -  Important: Use rem
+  border: 1px solid rgba($color, $bg-opacity-hover); // Tailwind's border-0
+  border-radius: 0.375rem; // Tailwind's rounded-md (roughly) - Important: Use rem
+  transition: background-color 0.2s ease-in-out; // Smooth transition
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($color, $bg-opacity-hover);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5; //Addded opacity
+  }
+
+  &[data-clicked="true"] {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($color, 0.2); // Add a focus shadow
+  }
+}
+
+.my-button {
+  @include button-styles($light-periwinle);
+}
+
+.my-button-danger {
+  @include button-styles($red);
+}
+.my-button-dark {
+  @include button-styles($black);
+}
