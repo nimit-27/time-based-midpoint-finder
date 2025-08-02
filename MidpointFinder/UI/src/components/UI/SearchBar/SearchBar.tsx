@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./SearchBar.scss";
 import useApi from "../../../hooks/useApi";
 import { getAutocompleteSuggestions } from "../../../service/mapService";
+import useDebounce from "../../../hooks/useDebounce";
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onSearch: (query: string) => void;
@@ -19,6 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     ...props
 }) => {
     const [query, setQuery] = useState<string>("");
+    const debouncedQuery = useDebounce(query, 300);
 
     const {
         getApiHandler: fetchAutocompleteSuggestions,
@@ -28,13 +30,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
         error: autocompleteSuggestionsError,
     } = useApi<{ key: string; name: string; coordinates: [number, number] }[]>();
 
-    const getAutocompleteSuggestionsHandler = (query: string) => {
-        fetchAutocompleteSuggestions(getAutocompleteSuggestions, query);
+    const getAutocompleteSuggestionsHandler = (value: string) => {
+        fetchAutocompleteSuggestions(getAutocompleteSuggestions, value);
     }
+
+    useEffect(() => {
+        if (debouncedQuery) {
+            getAutocompleteSuggestionsHandler(debouncedQuery);
+        }
+    }, [debouncedQuery]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
-        getAutocompleteSuggestionsHandler(value);
         setQuery(value);
     }
 
