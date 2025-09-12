@@ -31,9 +31,9 @@ public class GeocodeController {
     }
 
     @GetMapping("/getCoordinatesFromLocation/{location}")
-    public ResponseEntity<> getAutoCompleteSuggestions(@PathVariable("location") String location) {
+    public ResponseEntity<?> getAutoCompleteSuggestions(@PathVariable("location") String location) {
         if(location.isEmpty()) return ResponseEntity.badRequest().build();
 
-        geocodingService.geocodeAutocompleteList(location);
+        return geocodingService.geocodeAutocompleteList(location);
     }
 }
