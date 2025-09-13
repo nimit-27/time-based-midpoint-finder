@@ -47,8 +47,8 @@ function App() {
         Time-Based Mid-Point Finder
       </header>
       <div className='button-group'>
-        <SearchBar onSuggestionClick={onSuggestionClick} onSearch={(coordString) => getCoordFromStringHandler(coordString, "sb-1")} suggestions={[]} />
-        <SearchBar onSuggestionClick={onSuggestionClick} onSearch={(coordString) => getCoordFromStringHandler(coordString, "sb-2")} suggestions={[]} />
+        <SearchBar onSuggestionClick={onSuggestionClick} onSearch={(coordString) => getCoordFromStringHandler(coordString, "sb-1")} />
+        <SearchBar onSuggestionClick={onSuggestionClick} onSearch={(coordString) => getCoordFromStringHandler(coordString, "sb-2")} />
       </div>
       <MapComponent startPoint1={startPoint1} startPoint2={startPoint2} setStartPoint1={setStartPoint1} setStartPoint2={setStartPoint2} />
     </div>

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,6 +63,25 @@ public class OpenRouteGeocodingService implements GeocodingService{
                 appConfig.getOrsApiKey(),
                 location
         );
-        return List.of();
+
+        ResponseEntity<String> response = restTemplate.getForEntity(openRouteGeocodeAutocompleteURL, String.class);
+
+        List<Location> locations = new ArrayList<>();
+        try {
+            JsonNode root = mapper.readTree(response.getBody());
+            for (JsonNode feature : root.path("features")) {
+                String name = feature.path("properties").path("name").asText();
+                JsonNode coordinatesNode = feature.path("geometry").path("coordinates");
+                if (coordinatesNode.isArray() && coordinatesNode.size() >= 2) {
+                    double longitude = coordinatesNode.get(0).asDouble();
+                    double latitude = coordinatesNode.get(1).asDouble();
+                    locations.add(new Location(name, List.of(latitude, longitude)));
+                }
+            }
+        } catch (JsonProcessingException e) {
+            return List.of();
+        }
+
+        return locations;
     }
 }
