@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface MapService {
 
-    Path getPath(Coordinate start, Coordinate end);
+    Path getPath(Coordinate start, Coordinate end, String travelMode);
 
-    List<List<Double>> getWaypoints(Coordinate start, Coordinate end);
+    List<List<Double>> getWaypoints(Coordinate start, Coordinate end, String travelMode);
 
-    Long getDurationBetweenTwoPoints(Coordinate start, Coordinate end);
+    Long getDurationBetweenTwoPoints(Coordinate start, Coordinate end, String travelMode);
 
-    Long getDurationBetweenTwoPoints(List<Double> start, List<Double> end);
+    Long getDurationBetweenTwoPoints(List<Double> start, List<Double> end, String travelMode);
 
 }

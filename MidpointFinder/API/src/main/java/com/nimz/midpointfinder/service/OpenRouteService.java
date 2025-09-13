@@ -20,9 +20,11 @@ public class OpenRouteService implements MapService {
         this.appConfig = appConfig;
     }
 
-    public RouteResponse getRouteResponse(Coordinate start, Coordinate end) {
+    public RouteResponse getRouteResponse(Coordinate start, Coordinate end, String travelMode) {
+        String profile = travelMode == null || travelMode.isBlank() ? "driving-car" : travelMode;
         String orsUrl = String.format(
-                "http://api.openrouteservice.org/v2/directions/driving-car?api_key=%s&start=%f,%f&end=%f,%f&simplify_tolerance=100",
+                "http://api.openrouteservice.org/v2/directions/%s?api_key=%s&start=%f,%f&end=%f,%f&simplify_tolerance=100",
+                profile,
                 appConfig.getOrsApiKey(),
                 start.getLongitude(), start.getLatitude(), // Longitude first, then latitude
                 end.getLongitude(), end.getLatitude()
@@ -38,8 +40,8 @@ public class OpenRouteService implements MapService {
     }
 
     @Override
-    public Path getPath(Coordinate start, Coordinate end) {
-        Feature routeResponseFeatures = getRouteResponse(start, end)
+    public Path getPath(Coordinate start, Coordinate end, String travelMode) {
+        Feature routeResponseFeatures = getRouteResponse(start, end, travelMode)
                 .getFeatures()
                 .get(0);
 
@@ -53,8 +55,8 @@ public class OpenRouteService implements MapService {
     }
 
     @Override
-    public List<List<Double>> getWaypoints(Coordinate start, Coordinate end) {
-        return getRouteResponse(start, end)
+    public List<List<Double>> getWaypoints(Coordinate start, Coordinate end, String travelMode) {
+        return getRouteResponse(start, end, travelMode)
                 .getFeatures()
                 .get(0)
                 .getGeometry()
@@ -62,11 +64,11 @@ public class OpenRouteService implements MapService {
     }
 
     @Override
-    public Long getDurationBetweenTwoPoints(List<Double> start, List<Double> end) {
-        return getDurationBetweenTwoPoints(new Coordinate(start), new Coordinate(end));
+    public Long getDurationBetweenTwoPoints(List<Double> start, List<Double> end, String travelMode) {
+        return getDurationBetweenTwoPoints(new Coordinate(start), new Coordinate(end), travelMode);
     }
     @Override
-    public Long getDurationBetweenTwoPoints(Coordinate start, Coordinate end) {
+    public Long getDurationBetweenTwoPoints(Coordinate start, Coordinate end, String travelMode) {
         // If start and end coordinates are the same, return 0
         if (start.equals(end)) {
             System.out.println("Equal");
@@ -74,7 +76,7 @@ public class OpenRouteService implements MapService {
         }
 
         // Fetch the duration from API response
-        Long duration = getRouteResponse(start, end)
+        Long duration = getRouteResponse(start, end, travelMode)
                 .getFeatures()
                 .get(0)
                 .getProperties()

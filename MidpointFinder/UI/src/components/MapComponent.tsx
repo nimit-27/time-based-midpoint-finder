@@ -9,6 +9,7 @@ import {
 } from "react-leaflet";
 import CircleMarkerTooltip from "./UI/CircleMarkerTooltip";
 import MyButton from "./UI/Button/MyButton";
+import TravelModeSelector from "./UI/TravelModeSelector";
 import { getMidpoint, getPathBetweenTwoCoordinates } from "../service/mapService";
 import { Coordinate, Path } from "../types/types";
 import useApi from "../hooks/useApi";
@@ -60,6 +61,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
   >(null);
   const [midPoint, setMidPoint] = useState<[number, number] | null>(null);
   const [paths, setPaths] = useState<Path[]>([]);
+  const [travelMode, setTravelMode] = useState<string>("driving-car");
 
   // API hook call | getMidpoint 
   const {
@@ -104,7 +106,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
       getLatLngObj(coord2),
     ]
 
-    fetchMidpoint(getMidpoint, payload)
+    fetchMidpoint(getMidpoint, payload, travelMode)
   };
 
   const getPathHandler = (
@@ -121,7 +123,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
       getLatLngObj(coord2),
     ]
 
-    getPathBetweenTwoCoordinates(payload)
+    getPathBetweenTwoCoordinates(payload, travelMode)
       .then((response) => {
         setPaths((prev) => [...prev, response.data]);
         return response.data;
@@ -170,6 +172,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
 
   return (
     <div className="w90">
+      <TravelModeSelector value={travelMode} onChange={setTravelMode} />
       <MapContainer
         center={center}
         zoom={13}
