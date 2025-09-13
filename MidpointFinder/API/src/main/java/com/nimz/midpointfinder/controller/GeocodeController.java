@@ -1,6 +1,7 @@
 package com.nimz.midpointfinder.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nimz.midpointfinder.model.Location;
 import com.nimz.midpointfinder.service.GeocodingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +31,10 @@ public class GeocodeController {
         }
     }
 
-    @GetMapping("/getCoordinatesFromLocation/{location}")
-    public ResponseEntity<?> getAutoCompleteSuggestions(@PathVariable("location") String location) {
+    @GetMapping("/getAutoCompleteSuggestions/{location}")
+    public ResponseEntity<List<Location>> getAutoCompleteSuggestions(@PathVariable("location") String location) {
         if(location.isEmpty()) return ResponseEntity.badRequest().build();
 
-        return geocodingService.geocodeAutocompleteList(location);
+        return ResponseEntity.ok(geocodingService.geocodeAutocompleteList(location));
     }
 }
