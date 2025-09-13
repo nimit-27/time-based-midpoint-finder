@@ -6,14 +6,12 @@ import useDebounce from "../../../hooks/useDebounce";
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onSearch: (query: string) => void;
-    suggestions: string[];
     iconClassName?: string;
     onSuggestionClick: (suggestion: [number, number]) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
     onSearch,
-    suggestions = [],
     className,
     iconClassName = "search-icon",
     onSuggestionClick,
@@ -28,7 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         data: autocompleteSuggestionsData,
         isSuccess: isAutocompleteSuggestionsSuccess,
         error: autocompleteSuggestionsError,
-    } = useApi<{ key: string; name: string; coordinates: [number, number] }[]>();
+    } = useApi<{ name: string; coordinates: [number, number] }[]>();
 
     const getAutocompleteSuggestionsHandler = (value: string) => {
         fetchAutocompleteSuggestions(getAutocompleteSuggestions, value);
@@ -71,11 +69,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {/* Autocomplete Suggestions Dropdown */}
             {autocompleteSuggestionsData && autocompleteSuggestionsData.length > 0 && (
                 <ul className="suggestions-dropdown">
-                    {autocompleteSuggestionsData.map((suggestion) => (
+                    {autocompleteSuggestionsData.map((suggestion, idx) => (
                         <li
-                            key={suggestion.key}
+                            key={`${suggestion.name}-${idx}`}
                             className="suggestion-item"
-                            onClick={() => onSuggestionClick(suggestion.coordinates)}
+                            onClick={() => {
+                                setQuery(suggestion.name);
+                                onSuggestionClick(suggestion.coordinates);
+                            }}
                         >
                             {suggestion.name}
                         </li>

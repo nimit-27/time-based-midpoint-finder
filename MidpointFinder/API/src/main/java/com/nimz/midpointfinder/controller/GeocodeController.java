@@ -33,8 +33,11 @@ public class GeocodeController {
 
     @GetMapping("/getAutoCompleteSuggestions/{location}")
     public ResponseEntity<List<Location>> getAutoCompleteSuggestions(@PathVariable("location") String location) {
-        if(location.isEmpty()) return ResponseEntity.badRequest().build();
+        if (location == null || location.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        return ResponseEntity.ok(geocodingService.geocodeAutocompleteList(location));
+        List<Location> suggestions = geocodingService.geocodeAutocompleteList(location);
+        return ResponseEntity.ok(suggestions);
     }
 }
