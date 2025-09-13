@@ -26,50 +26,53 @@ public class RouteController {
     }
 
     @PostMapping("/waypoints")
-    public ResponseEntity<List<List<Double>>> getWaypointsApi(@RequestBody Coordinate[] coordinates) {
+    public ResponseEntity<List<List<Double>>> getWaypointsApi(@RequestBody Coordinate[] coordinates,
+                                                              @RequestParam(defaultValue = "driving-car") String travelMode) {
         if (coordinates.length != 2) return ResponseEntity.badRequest().build();
 
-        List<List<Double>> waypointsList = mapService.getWaypoints(coordinates[0], coordinates[1]);
+        List<List<Double>> waypointsList = mapService.getWaypoints(coordinates[0], coordinates[1], travelMode);
 
         return ResponseEntity.ok(waypointsList);
     }
 
     @PostMapping("/midpoint")
-    public ResponseEntity<List<Double>> getMidpointApi(@RequestBody Coordinate[] coordinates) {
+    public ResponseEntity<List<Double>> getMidpointApi(@RequestBody Coordinate[] coordinates,
+                                                       @RequestParam(defaultValue = "driving-car") String travelMode) {
         System.out.println("Midpoint called");
         System.out.println("start: " + coordinates[0]);
         System.out.println("end: " + coordinates[1]);
 
         if (coordinates.length != 2) return ResponseEntity.badRequest().build();
 
-        List<List<Double>> waypointsList = mapService.getWaypoints(coordinates[0], coordinates[1]);
+        List<List<Double>> waypointsList = mapService.getWaypoints(coordinates[0], coordinates[1], travelMode);
 
-        List<Double> midpoint = calculateMidWaypoint(waypointsList);
+        List<Double> midpoint = calculateMidWaypoint(waypointsList, travelMode);
         Collections.reverse(midpoint);
         return ResponseEntity.ok(midpoint);
     }
 
     @PostMapping("/path")
-    public ResponseEntity<Path> getPathApi(@RequestBody Coordinate[] coordinates) {
+    public ResponseEntity<Path> getPathApi(@RequestBody Coordinate[] coordinates,
+                                           @RequestParam(defaultValue = "driving-car") String travelMode) {
         if (coordinates.length != 2) return ResponseEntity.badRequest().build();
 
-        Path path = mapService.getPath(coordinates[0], coordinates[1]);
+        Path path = mapService.getPath(coordinates[0], coordinates[1], travelMode);
 
 //        System.out.println("Waypoints size: " + path.getWayPoints().size());
 
         return ResponseEntity.ok(path);
     }
-    private List<Double> calculateMidWaypoint(List<List<Double>> waypointsList) {
+    private List<Double> calculateMidWaypoint(List<List<Double>> waypointsList, String travelMode) {
         if (waypointsList == null || waypointsList.isEmpty()) {
             System.out.println("No waypoints available.");
             return null;
         }
 
-        List<Double> mp = recursive(waypointsList, 0, waypointsList.size() - 1, (waypointsList.size() - 1)/2, 0, waypointsList.size() - 1);
+        List<Double> mp = recursive(waypointsList, 0, waypointsList.size() - 1, (waypointsList.size() - 1)/2, 0, waypointsList.size() - 1, travelMode);
         return mp;
     }
     int count = 0;
-    private List<Double> recursive(List<List<Double>> waypointsList, int start1, int start2, int pointInBetween, int actualStart1, int actualStart2) {
+    private List<Double> recursive(List<List<Double>> waypointsList, int start1, int start2, int pointInBetween, int actualStart1, int actualStart2, String travelMode) {
 //        System.out.println("Recursive fn called: " + count++ + " times");
         // Create reversed copies of the inner lists
         List<Double> point1 = new ArrayList<>(waypointsList.get(actualStart1));
@@ -81,8 +84,8 @@ public class RouteController {
         Collections.reverse(point2);
         Collections.reverse(midPoint);
 
-        long t1 = mapService.getDurationBetweenTwoPoints(point1, midPoint);
-        long t2 = mapService.getDurationBetweenTwoPoints(point2, midPoint);
+        long t1 = mapService.getDurationBetweenTwoPoints(point1, midPoint, travelMode);
+        long t2 = mapService.getDurationBetweenTwoPoints(point2, midPoint, travelMode);
         long timeGap = Math.abs(t1 - t2);
         System.out.println("|------- " + t1 + "s -------| "+ pointInBetween +" |-------- " + t2 + "s --------|" + "    Timegap: " + timeGap);
 //        System.out.println("Current Mid Point: " + pointInBetween + " TimeGap:" + timeGap);
@@ -118,21 +121,21 @@ public class RouteController {
 
         // return recursive(waypointsList, start1, start2, newPointInBetween);
         if(t1 > t2) {
-            return recursive(waypointsList, start1, pointInBetween, newPointInBetween, 0, waypointsList.size() - 1);
+            return recursive(waypointsList, start1, pointInBetween, newPointInBetween, 0, waypointsList.size() - 1, travelMode);
         } else {
-            return recursive(waypointsList, pointInBetween, start2, newPointInBetween, 0, waypointsList.size() - 1);
+            return recursive(waypointsList, pointInBetween, start2, newPointInBetween, 0, waypointsList.size() - 1, travelMode);
         }
     }
 
     // If the arguments are List<Double>
-    private Long computeTimeGap(List<Double> start1, List<Double> start2, List<Double> pointInBetween) {
-        return computeTimeGap(new Coordinate(start1), new Coordinate(start2), new Coordinate(pointInBetween));
+    private Long computeTimeGap(List<Double> start1, List<Double> start2, List<Double> pointInBetween, String travelMode) {
+        return computeTimeGap(new Coordinate(start1), new Coordinate(start2), new Coordinate(pointInBetween), travelMode);
     }
 
     // If the arguments are Coordinates
-    private Long computeTimeGap(Coordinate start1, Coordinate start2, Coordinate pointInBetween) {
-        long t1 = mapService.getDurationBetweenTwoPoints(start1, pointInBetween);
-        long t2 = mapService.getDurationBetweenTwoPoints(start2, pointInBetween);
+    private Long computeTimeGap(Coordinate start1, Coordinate start2, Coordinate pointInBetween, String travelMode) {
+        long t1 = mapService.getDurationBetweenTwoPoints(start1, pointInBetween, travelMode);
+        long t2 = mapService.getDurationBetweenTwoPoints(start2, pointInBetween, travelMode);
 
 //        long timeGap = Math.abs(t1 - t2);
         long timeGap = t1 - t2;
