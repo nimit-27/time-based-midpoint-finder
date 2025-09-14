@@ -15,6 +15,6 @@ export function getCoordFromString(coordString: string): Promise<{ status: numbe
     return axios.get(`http://localhost:8081/api/getCoordinatesFromLocation/${coordString}`)
 }
 
-export function getAutocompleteSuggestions(coordString: string) { 
-    return axios.get(`http://localhost:8081/api/getAutocompleteSuggestions/${coordString}`)
+export function getAutocompleteSuggestions(coordString: string) {
+    return axios.get(`http://localhost:8081/api/getAutoCompleteSuggestions/${coordString}`)
 }
