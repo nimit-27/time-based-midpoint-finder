@@ -39,6 +39,9 @@ import PortraitIcon from '@mui/icons-material/Portrait';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import { PauseCircleOutline, NorthEast, Moving, PersonAddAlt } from '@mui/icons-material';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
+import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 
 // Define the icon map
 const iconMap = {
@@ -84,6 +87,9 @@ const iconMap = {
     portrait: PortraitIcon,
     formatColorFill: FormatColorFillIcon,
     feedback: FeedbackIcon,
+    directionsCar: DirectionsCarIcon,
+    directionsBike: DirectionsBikeIcon,
+    directionsWalk: DirectionsWalkIcon,
 };
 
 // Valid keys for the icon map
