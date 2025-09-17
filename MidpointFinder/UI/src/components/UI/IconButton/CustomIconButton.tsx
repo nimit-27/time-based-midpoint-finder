@@ -38,6 +38,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PortraitIcon from '@mui/icons-material/Portrait';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import FeedbackIcon from '@mui/icons-material/Feedback';
+import SearchIcon from '@mui/icons-material/Search';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { PauseCircleOutline, NorthEast, Moving, PersonAddAlt } from '@mui/icons-material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
@@ -90,6 +92,8 @@ const iconMap = {
     directionsCar: DirectionsCarIcon,
     directionsBike: DirectionsBikeIcon,
     directionsWalk: DirectionsWalkIcon,
+    search: SearchIcon,
+    autorenew: AutorenewIcon,
 };
 
 // Valid keys for the icon map
@@ -116,12 +120,13 @@ export const IconComponent: React.FC<{
 interface CustomIconButtonProps extends IconButtonProps {
     icon: string;
     className?: string;
+    iconClassName?: string;
 }
 
-const CustomIconButton: React.FC<CustomIconButtonProps> = ({ icon, className, ...props }) => {
+const CustomIconButton: React.FC<CustomIconButtonProps> = ({ icon, className, iconClassName, ...props }) => {
     return (
         <IconButton {...props} className={className}>
-            <IconComponent icon={icon} className={className} />
+            <IconComponent icon={icon} className={iconClassName ?? className} />
         </IconButton>
     );
 };
