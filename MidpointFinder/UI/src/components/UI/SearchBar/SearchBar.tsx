@@ -3,6 +3,7 @@ import "./SearchBar.scss";
 import useApi from "../../../hooks/useApi";
 import { getAutocompleteSuggestions } from "../../../service/mapService";
 import useDebounce from "../../../hooks/useDebounce";
+import CustomIconButton from "../IconButton/CustomIconButton";
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onSearch: (query: string) => void;
@@ -13,19 +14,18 @@ interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const SearchBar: React.FC<SearchBarProps> = ({
     onSearch,
     className,
-    iconClassName = "search-icon",
+    iconClassName = "",
     onSuggestionClick,
     ...props
 }) => {
     const [query, setQuery] = useState<string>("");
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const debouncedQuery = useDebounce(query, 300);
 
     const {
         getApiHandler: fetchAutocompleteSuggestions,
         isLoading: isAutocompleteSuggestionsLoading,
         data: autocompleteSuggestionsData,
-        isSuccess: isAutocompleteSuggestionsSuccess,
-        error: autocompleteSuggestionsError,
     } = useApi<{ name: string; coordinates: [number, number] }[]>();
 
     const getAutocompleteSuggestionsHandler = (value: string) => {
@@ -33,19 +33,47 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     useEffect(() => {
-        if (debouncedQuery) {
+        if (!debouncedQuery) {
+            setIsMenuOpen(false);
+            return;
+        }
+
+        if (isMenuOpen) {
             getAutocompleteSuggestionsHandler(debouncedQuery);
         }
-    }, [debouncedQuery]);
+    }, [debouncedQuery, isMenuOpen]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setQuery(value);
+        setIsMenuOpen(!!value.trim());
     }
 
     const handleSearch = () => {
         if (onSearch) onSearch(query);
+        setIsMenuOpen(false);
     }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            handleSearch();
+        }
+    }
+
+    const handleSuggestionSelect = (suggestion: { name: string; coordinates: [number, number] }) => {
+        setQuery(suggestion.name);
+        onSuggestionClick(suggestion.coordinates);
+        if (onSearch) onSearch(suggestion.name);
+        setIsMenuOpen(false);
+    }
+
+    const shouldRenderSuggestions =
+        isMenuOpen &&
+        !!autocompleteSuggestionsData?.length &&
+        !isAutocompleteSuggestionsLoading;
+
+    const iconClasses = `search-icon ${iconClassName ?? ""} ${isAutocompleteSuggestionsLoading ? "loading" : ""}`.trim();
 
     return (
         <div className={`search-bar ${className ?? ""}`}>
@@ -54,34 +82,35 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     type="text"
                     className="search-input"
                     value={query}
-                    placeholder="Search..."
+                    placeholder="Get Path"
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     {...props}
                 />
-                <span className={iconClassName}>
-                    {isAutocompleteSuggestionsLoading ? (
-                        <span className="loader">⏳</span> // Loader while fetching suggestions
-                    ) : (
-                        "🔍"
-                    )}
-                </span>
+                <CustomIconButton
+                    icon={isAutocompleteSuggestionsLoading ? "autorenew" : "search"}
+                    className="search-icon-button"
+                    iconClassName={iconClasses}
+                    onClick={handleSearch}
+                    aria-label={isAutocompleteSuggestionsLoading ? "Loading suggestions" : "Search"}
+                    disabled={isAutocompleteSuggestionsLoading}
+                />
             </div>
             {/* Autocomplete Suggestions Dropdown */}
-            {autocompleteSuggestionsData && autocompleteSuggestionsData.length > 0 && (
-                <ul className="suggestions-dropdown">
+            {shouldRenderSuggestions && (
+                <div className="suggestions-dropdown" role="listbox">
                     {autocompleteSuggestionsData.map((suggestion, idx) => (
-                        <li
+                        <button
                             key={`${suggestion.name}-${idx}`}
+                            type="button"
                             className="suggestion-item"
-                            onClick={() => {
-                                setQuery(suggestion.name);
-                                onSuggestionClick(suggestion.coordinates);
-                            }}
+                            onClick={() => handleSuggestionSelect(suggestion)}
+                            role="option"
                         >
                             {suggestion.name}
-                        </li>
+                        </button>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );
