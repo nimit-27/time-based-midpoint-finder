@@ -6,20 +6,27 @@ import useDebounce from "../../../hooks/useDebounce";
 import CustomIconButton from "../IconButton/CustomIconButton";
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    searchBarId: string;
     onSearch: (query: string) => void;
     iconClassName?: string;
-    onSuggestionClick: (suggestion: [number, number]) => void;
+    onSuggestionClick: (searchBarId: string, suggestion: [number, number]) => void;
+    value?: string;
+    onValueChange?: (value: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
+    searchBarId,
     onSearch,
     className,
     iconClassName = "",
     onSuggestionClick,
+    value,
+    onValueChange,
     ...props
 }) => {
-    const [query, setQuery] = useState<string>("");
+    const [internalQuery, setInternalQuery] = useState<string>(value ?? "");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const query = value ?? internalQuery;
     const debouncedQuery = useDebounce(query, 300);
 
     const {
@@ -33,6 +40,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     useEffect(() => {
+        if (value !== undefined) {
+            setInternalQuery(value);
+        }
+    }, [value]);
+
+    useEffect(() => {
         if (!debouncedQuery) {
             setIsMenuOpen(false);
             return;
@@ -44,9 +57,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }, [debouncedQuery, isMenuOpen]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        setQuery(value);
-        setIsMenuOpen(!!value.trim());
+        const inputValue = event.target.value;
+        if (onValueChange) {
+            onValueChange(inputValue);
+        } else {
+            setInternalQuery(inputValue);
+        }
+        setIsMenuOpen(!!inputValue.trim());
     }
 
     const handleSearch = () => {
@@ -62,8 +79,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     const handleSuggestionSelect = (suggestion: { name: string; coordinates: [number, number] }) => {
-        setQuery(suggestion.name);
-        onSuggestionClick(suggestion.coordinates);
+        const coordinatesString = `${suggestion.coordinates[0]}, ${suggestion.coordinates[1]}`;
+        if (onValueChange) {
+            onValueChange(coordinatesString);
+        } else {
+            setInternalQuery(coordinatesString);
+        }
+        onSuggestionClick(searchBarId, suggestion.coordinates);
         if (onSearch) onSearch(suggestion.name);
         setIsMenuOpen(false);
     }
