@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './App.module.scss';
 import MapComponent from './components/MapComponent';
-import SearchBar from './components/UI/SearchBar/SearchBar';
+import SearchBar, { AutocompleteSuggestion } from './components/UI/SearchBar/SearchBar';
 import useApi from './hooks/useApi';
 import { getCoordFromString } from './service/mapService';
 
@@ -46,13 +46,19 @@ function App() {
     fetchCoordFromString(getCoordFromString, coordString)
   }
 
-  const onSuggestionClick = (id: string, suggestionCoord: [number, number]) => {
+  const onSuggestionClick = (id: string, suggestion: AutocompleteSuggestion) => {
+    const coordinates: [number, number] = [
+      suggestion.coordinates[0],
+      suggestion.coordinates[1],
+    ];
+
     setSearchBarId(id);
-    updateSearchValue(id, formatCoordinates(suggestionCoord));
+    updateSearchValue(id, suggestion.name);
+
     if (id === "sb-1") {
-      setStartPoint1(suggestionCoord);
+      setStartPoint1(coordinates);
     } else if (id === "sb-2") {
-      setStartPoint2(suggestionCoord);
+      setStartPoint2(coordinates);
     }
   }
 
