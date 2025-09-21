@@ -5,6 +5,7 @@ import {
   Polyline,
   TileLayer,
   Tooltip,
+  useMap,
   useMapEvents,
 } from "react-leaflet";
 import CircleMarkerTooltip from "./UI/CircleMarkerTooltip";
@@ -51,8 +52,20 @@ interface MapComponentProps {
   setStartPoint2: React.Dispatch<React.SetStateAction<[number, number] | null>>;
 }
 
+const DEFAULT_CENTER: [number, number] = [28, 77];
+
+const MapUpdater: React.FC<{ center: [number, number] }> = ({ center }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center);
+  }, [center, map]);
+
+  return null;
+};
+
 const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, setStartPoint1, setStartPoint2 }) => {
-  const center: [number, number] = [28, 77];
+  const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER);
   console.log("startPoint1", startPoint1);
   // const [startPoint1, setStartPoint1] = useState<[number, number] | null>(null);
   // const [startPoint2, setStartPoint2] = useState<[number, number] | null>(null);
@@ -82,6 +95,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
   } = useApi();
 
   const handleMapClick = (clickedPoint: [number, number]) => {
+    setCenter(clickedPoint);
+
     if (!startPoint1) {
       setStartPoint1(clickedPoint);
     } else if (!startPoint2) {
@@ -141,6 +156,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
     setPaths([]);
   };
 
+  useEffect(() => {
+    if (pendingStartPoint) {
+      setCenter(pendingStartPoint);
+    }
+  }, [pendingStartPoint]);
+
+  useEffect(() => {
+    if (startPoint2) {
+      setCenter(startPoint2);
+    } else if (startPoint1) {
+      setCenter(startPoint1);
+    } else {
+      setCenter(DEFAULT_CENTER);
+    }
+  }, [startPoint1, startPoint2]);
+
   useMemo(() => {
     if (isMidpointSuccess) {
       console.log("API call successful:", midpointData);
@@ -178,6 +209,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ startPoint1, startPoint2, s
         zoom={13}
         style={{ width: "100%", height: "500px" }}
       >
+        <MapUpdater center={center} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MapClickHandler />
         {startPoint1 && (
