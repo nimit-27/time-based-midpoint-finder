@@ -5,11 +5,16 @@ import { getAutocompleteSuggestions } from "../../../service/mapService";
 import useDebounce from "../../../hooks/useDebounce";
 import CustomIconButton from "../IconButton/CustomIconButton";
 
+export interface AutocompleteSuggestion {
+    name: string;
+    coordinates: [number, number];
+}
+
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
     searchBarId: string;
     onSearch: (query: string) => void;
     iconClassName?: string;
-    onSuggestionClick: (searchBarId: string, suggestion: [number, number]) => void;
+    onSuggestionClick: (searchBarId: string, suggestion: AutocompleteSuggestion) => void;
     value?: string;
     onValueChange?: (value: string) => void;
 }
@@ -33,7 +38,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         getApiHandler: fetchAutocompleteSuggestions,
         isLoading: isAutocompleteSuggestionsLoading,
         data: autocompleteSuggestionsData,
-    } = useApi<{ name: string; coordinates: [number, number] }[]>();
+    } = useApi<AutocompleteSuggestion[]>();
 
     const getAutocompleteSuggestionsHandler = (value: string) => {
         fetchAutocompleteSuggestions(getAutocompleteSuggestions, value);
@@ -78,15 +83,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
         }
     }
 
-    const handleSuggestionSelect = (suggestion: { name: string; coordinates: [number, number] }) => {
-        const coordinatesString = `${suggestion.coordinates[0]}, ${suggestion.coordinates[1]}`;
+    const handleSuggestionSelect = (suggestion: AutocompleteSuggestion) => {
+        const normalizedCoordinates: [number, number] = [
+            suggestion.coordinates[0],
+            suggestion.coordinates[1],
+        ];
+
         if (onValueChange) {
-            onValueChange(coordinatesString);
+            onValueChange(suggestion.name);
         } else {
-            setInternalQuery(coordinatesString);
+            setInternalQuery(suggestion.name);
         }
-        onSuggestionClick(searchBarId, suggestion.coordinates);
-        if (onSearch) onSearch(suggestion.name);
+
+        onSuggestionClick(searchBarId, {
+            ...suggestion,
+            coordinates: normalizedCoordinates,
+        });
         setIsMenuOpen(false);
     }
 
