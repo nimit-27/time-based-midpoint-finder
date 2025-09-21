@@ -9,7 +9,7 @@ echo "$SCRIPT_DIR"
 # Define paths
 REACT_DIR="$SCRIPT_DIR/UI"
 JAVA_DIR="$SCRIPT_DIR/API"
-IDEA="/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2025.1/bin/idea64.exe"
+IDEA="/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2025.2.1/bin/idea64.exe"
 
 # Initial flags
 open=false

@@ -45,21 +45,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     useEffect(() => {
-        if (value !== undefined) {
-            setInternalQuery(value);
-        }
-    }, [value]);
-
-    useEffect(() => {
-        if (!debouncedQuery) {
-            setIsMenuOpen(false);
-            return;
-        }
-
-        if (isMenuOpen) {
+        if (debouncedQuery) {
             getAutocompleteSuggestionsHandler(debouncedQuery);
         }
-    }, [debouncedQuery, isMenuOpen]);
+    }, [debouncedQuery]);
+
+    // useEffect(() => {
+    //     if (!debouncedQuery) {
+    //         setIsMenuOpen(false);
+    //         return;
+    //     }
+
+    //     if (isMenuOpen) {
+    //         getAutocompleteSuggestionsHandler(debouncedQuery);
+    //     }
+    // }, [debouncedQuery, isMenuOpen]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = event.target.value;
@@ -116,7 +116,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     type="text"
                     className="search-input"
                     value={query}
-                    placeholder="Get Path"
+                    placeholder="Search..."
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     {...props}
