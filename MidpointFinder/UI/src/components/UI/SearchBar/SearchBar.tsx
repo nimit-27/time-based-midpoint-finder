@@ -12,6 +12,7 @@ export interface AutocompleteSuggestion {
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
     searchBarId: string;
+    label?: string;
     onSearch: (query: string) => void;
     iconClassName?: string;
     onSuggestionClick: (searchBarId: string, suggestion: AutocompleteSuggestion) => void;
@@ -21,6 +22,7 @@ interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const SearchBar: React.FC<SearchBarProps> = ({
     searchBarId,
+    label,
     onSearch,
     className,
     iconClassName = "",
@@ -111,8 +113,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     return (
         <div className={`search-bar ${className ?? ""}`}>
+            {label && <label className="search-label" htmlFor={props.id ?? searchBarId}>{label}</label>}
             <div className="input-container">
                 <input
+                    id={searchBarId}
                     type="text"
                     className="search-input"
                     value={query}

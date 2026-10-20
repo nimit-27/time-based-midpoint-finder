@@ -18,3 +18,17 @@
   display: flex;
   gap: 1rem;
 }
+
+.destinations {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+  width: 90%;
+  margin: 12px 0;
+}
+
+.swapButton {
+  align-self: end;
+  color: #b6bbeb !important;
+}

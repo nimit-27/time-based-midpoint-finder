@@ -4,6 +4,7 @@ import MapComponent from './components/MapComponent';
 import SearchBar, { AutocompleteSuggestion } from './components/UI/SearchBar/SearchBar';
 import useApi from './hooks/useApi';
 import { getCoordFromString } from './service/mapService';
+import CustomIconButton from './components/UI/IconButton/CustomIconButton';
 
 function App() {
   const [startPoint1, setStartPoint1] = useState<[number, number] | null>(null);
@@ -41,6 +42,16 @@ function App() {
     setSearchValues((prev) => ({ ...prev, [id]: value }));
   };
 
+  const swapDestinations = () => {
+    setSearchValues((prev) => ({
+      ...prev,
+      "sb-1": prev["sb-2"],
+      "sb-2": prev["sb-1"],
+    }));
+    setStartPoint1(startPoint2);
+    setStartPoint2(startPoint1);
+  };
+
   const getCoordFromStringHandler = (coordString: string, searchBarId: string) => {
     setSearchBarId(searchBarId);
     fetchCoordFromString(getCoordFromString, coordString)
@@ -67,16 +78,26 @@ function App() {
       <header className="App-header">
         Time-Based Mid-Point Finder
       </header>
-      <div className='button-group'>
+      <div className={styles.destinations}>
         <SearchBar
           searchBarId="sb-1"
+          label="From"
           value={searchValues["sb-1"]}
           onValueChange={(value) => updateSearchValue("sb-1", value)}
           onSuggestionClick={onSuggestionClick}
           onSearch={(coordString) => getCoordFromStringHandler(coordString, "sb-1")}
         />
+        <CustomIconButton
+          icon="swap_horiz"
+          className={styles.swapButton}
+          aria-label="Swap From and To destinations"
+          title="Swap destinations"
+          onClick={swapDestinations}
+          disabled={isCoordFromStringLoading}
+        />
         <SearchBar
           searchBarId="sb-2"
+          label="To"
           value={searchValues["sb-2"]}
           onValueChange={(value) => updateSearchValue("sb-2", value)}
           onSuggestionClick={onSuggestionClick}
