@@ -40,6 +40,7 @@ import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import SearchIcon from '@mui/icons-material/Search';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { PauseCircleOutline, NorthEast, Moving, PersonAddAlt } from '@mui/icons-material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
@@ -94,6 +95,7 @@ const iconMap = {
     directionsWalk: DirectionsWalkIcon,
     search: SearchIcon,
     autorenew: AutorenewIcon,
+    swap_horiz: SwapHorizIcon,
 };
 
 // Valid keys for the icon map
