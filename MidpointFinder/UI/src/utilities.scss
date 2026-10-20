@@ -1,0 +1,41 @@
+@for $i from 10 through 100 {
+    @if $i % 5 == 0 {
+        .w#{$i} {
+            width: #{$i + '%'};
+        }
+    }
+}
+
+$colors: (
+    red: #ff0000,
+    blue: #0000ff,
+    green: #00ff00,
+    yellow: #ffff00,
+    gray: #808080
+);
+$opacity-steps: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100;
+
+@each $color-name, $color-value in $colors {
+    @each $opacity in $opacity-steps {
+        .bg-#{$color-name}-#{$opacity} {
+            background-color: $color-value !important;
+            opacity: $opacity / 100 !important;
+        }
+    }
+    .bg-#{$color-name} {
+        background-color: $color-value !important;
+    }
+}
+
+.button-group {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    justify-content: center; /* Center the buttons horizontally */
+    margin: 5px;
+}
+
+.tooltip {
+    padding: 2px !important;
+    // background-color: #21215779 !important;
+    // border: none !important;
+}
